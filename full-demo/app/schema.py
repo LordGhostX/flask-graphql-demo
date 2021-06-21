@@ -30,10 +30,17 @@ class Mutation(graphene.ObjectType):
 
 
 class Query(graphene.ObjectType):
-    hello = graphene.String(name=graphene.String(required=True))
+    get_note = graphene.Field(Note, id=graphene.String(required=True))
 
-    def resolve_hello(self, info, name):
-        return f"Hello {name}!"
+    def resolve_get_note(self, info, id):
+        note = Notes.query.get(id)
+        return Note(
+            id=note.id,
+            title=note.title,
+            body=note.body,
+            last_updated=note.last_updated,
+            date_created=note.date_created
+        )
 
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
