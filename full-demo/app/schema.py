@@ -43,9 +43,21 @@ class updateNote(graphene.Mutation):
         return updateNote(note=Notes.query.get(id))
 
 
+class deleteNote(graphene.Mutation):
+    class Arguments:
+        id = graphene.String()
+    ok = graphene.Boolean()
+
+    def mutate(self, info, id):
+        db.session.delete(Notes.query.get(id))
+        db.session.commit()
+        return deleteNote(ok=True)
+
+
 class Mutation(graphene.ObjectType):
     createNote = createNote.Field()
     updateNote = updateNote.Field()
+    deleteNote = deleteNote.Field()
 
 
 class Query(graphene.ObjectType):
