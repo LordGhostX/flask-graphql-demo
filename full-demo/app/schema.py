@@ -1,3 +1,4 @@
+from datetime import datetime
 import graphene
 from app import db
 from app.models import Notes
@@ -24,8 +25,27 @@ class createNote(graphene.Mutation):
         return createNote(note=note)
 
 
+class updateNote(graphene.Mutation):
+    class Arguments:
+        id = graphene.String()
+        title = graphene.String()
+        body = graphene.String()
+    note = graphene.Field(lambda: Note)
+
+    def mutate(self, info, id, title, body):
+        update_data = {
+            "title": title,
+            "body": body,
+            "last_updated": datetime.utcnow()
+        }
+        Notes.query.filter_by(id=id).update(update_data)
+        db.session.commit()
+        return updateNote(note=Notes.query.get(id))
+
+
 class Mutation(graphene.ObjectType):
     createNote = createNote.Field()
+    updateNote = updateNote.Field()
 
 
 class Query(graphene.ObjectType):
