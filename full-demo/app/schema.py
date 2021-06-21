@@ -16,13 +16,14 @@ class createNote(graphene.Mutation):
     class Arguments:
         title = graphene.String()
         body = graphene.String()
-    note = graphene.Field(lambda: Note)
+    ok = graphene.Boolean()
+    note = graphene.Field(Note)
 
     def mutate(self, info, title, body):
         note = Notes(title=title, body=body)
         db.session.add(note)
         db.session.commit()
-        return createNote(note=note)
+        return createNote(ok=True, note=note)
 
 
 class updateNote(graphene.Mutation):
@@ -30,7 +31,8 @@ class updateNote(graphene.Mutation):
         id = graphene.String()
         title = graphene.String()
         body = graphene.String()
-    note = graphene.Field(lambda: Note)
+    ok = graphene.Boolean()
+    note = graphene.Field(Note)
 
     def mutate(self, info, id, title, body):
         update_data = {
@@ -40,7 +42,7 @@ class updateNote(graphene.Mutation):
         }
         Notes.query.filter_by(id=id).update(update_data)
         db.session.commit()
-        return updateNote(note=Notes.query.get(id))
+        return updateNote(ok=True, note=Notes.query.get(id))
 
 
 class deleteNote(graphene.Mutation):
